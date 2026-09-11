@@ -27,8 +27,8 @@
       background: #FFFFFF; border-bottom: 4px solid var(--accent);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); padding: 14px 16px;
     }
-    .panel-container { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-    .control-group { display: flex; align-items: center; gap: 10px; }
+    .panel-container { max-width: 1050px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+    .control-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     .btn { padding: 10px 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.15); }
     .btn:active { transform: translateY(3px); box-shadow: none !important; }
@@ -39,7 +39,47 @@
 
     select { padding: 10px 16px; border-radius: 16px; border: 3px solid var(--secondary); background: white; font-size: 16px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
 
-    /* Mic Status Badge */
+    /* Style cho Thanh chỉnh Âm lượng Slider */
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #EDF2F7;
+      padding: 6px 14px;
+      border-radius: 16px;
+      border: 2px solid var(--secondary);
+    }
+    .volume-container label { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 4px; }
+    .volume-slider {
+      -webkit-appearance: none;
+      width: 100px;
+      height: 8px;
+      border-radius: 4px;
+      background: #CBD5E0;
+      outline: none;
+      cursor: pointer;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .volume-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      border: none;
+    }
+    .vol-val-badge { font-weight: 700; color: var(--primary); min-width: 40px; }
+
     .mic-status-badge {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 700;
@@ -113,9 +153,16 @@
 
         <label for="rateSelect" style="font-weight: 700;">Tốc độ:</label>
         <select id="rateSelect" onchange="updateVoiceSettings()">
-          <option value="0.75" selected>Chậm (Cho bé)</option>
-          <option value="1.0">Vừa phải</option>
+            <option value="1.0">Vừa phải</option>
+            <option value="0.75" selected>Chậm (Cho bé)</option>
         </select>
+
+        <!-- THANH CHỈNH ÂM LƯỢNG MỚI (10% - 100%) -->
+        <div class="volume-container">
+          <label for="volumeSlider">🔊</label>
+          <input type="range" id="volumeSlider" class="volume-slider" min="10" max="100" value="100" step="5" oninput="onVolumeChange(this.value)">
+          <span id="volumeValue" class="vol-val-badge">100%</span>
+        </div>
       </div>
     </div>
   </div>
@@ -291,13 +338,11 @@
     let availableVoices = [];
     let activeRecognition = null;
 
-    // Bộ nhớ lưu âm thanh ghi âm bé đọc (Blob URLs)
     let recordedAudioUrls = {};
     let mediaRecorder = null;
     let audioChunks = [];
     let userStream = null;
 
-    // --- KIỂM TRẢ QUYỀN MICROPHONE ---
     async function checkMicrophonePermission() {
       const badge = document.getElementById("micStatus");
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -343,7 +388,7 @@
         return stream;
       } catch (err) {
         updateMicStatusBadge('denied');
-        alert("Ba mẹ vui lòng BẬT QUYỀN TRUY CẬP MICROPHONE trên trình duyệt (hoặc cài đặt thiết bị) để bé sử dụng tính năng thu âm nhé!");
+        alert("Ba mẹ vui lòng BẬT QUYỀN TRUY CẬP MICROPHONE trên trình duyệt để bé sử dụng nhé!");
         return null;
       }
     }
@@ -408,6 +453,12 @@
 
     function changeTopic() { renderVocabulary(); }
 
+    // XỬ LÝ SỰ KIỆN KHI THAY ĐỔI ÂM LƯỢNG
+    function onVolumeChange(val) {
+      document.getElementById("volumeValue").textContent = `${val}%`;
+      updateVoiceSettings();
+    }
+
     function speakSingle(index) {
       if (isPlayingAll) stopSpeech();
       highlightCard(index);
@@ -419,15 +470,25 @@
     function speakWord(text, onEndCallback) {
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
+
       const utterance = new SpeechSynthesisUtterance(text);
       const lang = document.getElementById("accentSelect").value;
       const rate = parseFloat(document.getElementById("rateSelect").value);
+      
+      // Lấy âm lượng từ slider (chuyển đổi từ % về dạng thập phân 0.1 -> 1.0)
+      const volPercent = parseInt(document.getElementById("volumeSlider").value, 10);
+      const volume = volPercent / 100;
 
       utterance.lang = lang;
       utterance.rate = rate;
+      utterance.volume = volume;
+      utterance.pitch = 1.1; // Giúp giọng phát rõ/sáng hơn trên loa tablet
 
       if (availableVoices.length === 0) loadVoices();
-      const targetVoice = availableVoices.find(v => v.lang === lang || v.lang.replace('_', '-') === lang);
+      
+      const targetVoice = availableVoices.find(v => (v.lang === lang || v.lang.replace('_', '-') === lang) && (v.name.includes("Enhanced") || v.name.includes("Google") || v.name.includes("Natural"))) || 
+                          availableVoices.find(v => v.lang === lang || v.lang.replace('_', '-') === lang);
+      
       if (targetVoice) utterance.voice = targetVoice;
 
       utterance.onend = () => { if (onEndCallback) onEndCallback(); };
@@ -436,18 +497,16 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // --- THU ÂM & NHẬN DẠNG GIỌNG NÓI BÉ ---
     async function startRecognition(index, targetWord) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (!SpeechRecognition) {
-        alert("Bé nhờ ba mẹ mở trên trình duyệt Chrome hoặc Edge để sử dụng micro nhé!");
+        alert("Bé nhờ ba mẹ mở trên trình duyệt Chrome hoặc Safari/Edge để sử dụng micro nhé!");
         return;
       }
 
-      // Đảm bảo stream Micro đã hoạt động
       const stream = await requestMicAccess();
-      if (!stream) return; // Không được cấp quyền
+      if (!stream) return;
 
       if (isPlayingAll) stopSpeech();
       if (activeRecognition) activeRecognition.abort();
@@ -460,7 +519,6 @@
       feedbackEl.className = "feedback listening";
       feedbackEl.textContent = "🎙️ Bé nói đi...";
 
-      // Ghi âm âm thanh thực từ Mic
       audioChunks = [];
       try {
         mediaRecorder = new MediaRecorder(stream);
@@ -477,10 +535,9 @@
         };
         mediaRecorder.start();
       } catch (e) {
-        console.warn("Không thể khởi tạo MediaRecorder:", e);
+        console.warn("MediaRecorder error:", e);
       }
 
-      // Khởi tạo Speech Recognition
       const recognition = new SpeechRecognition();
       activeRecognition = recognition;
 
@@ -505,7 +562,7 @@
         }
       };
 
-      recognition.onerror = (event) => {
+      recognition.onerror = () => {
         micBtn.classList.remove("listening");
         feedbackEl.className = "feedback incorrect";
         feedbackEl.textContent = "Thử lại nhé!";
@@ -522,7 +579,6 @@
       recognition.start();
     }
 
-    // --- PHÁT LẠI GIỌNG BÉ VỪA ĐỌC ---
     function playUserRecording(index) {
       if (isPlayingAll) stopSpeech();
       const topicIndex = document.getElementById("topicSelect").value || 0;
@@ -531,6 +587,9 @@
 
       if (url) {
         const audio = new Audio(url);
+        // Đồng bộ âm lượng phát bài ghi âm theo thanh slider
+        const volPercent = parseInt(document.getElementById("volumeSlider").value, 10);
+        audio.volume = volPercent / 100;
         audio.play();
       }
     }
