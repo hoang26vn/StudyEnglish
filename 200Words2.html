@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Học Từ Vựng Tiếng Anh Cùng Bé!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF6B6B;
+      --primary-hover: #FF5252;
+      --secondary: #4ECDC4;
+      --accent: #FFE66D;
+      --purple: #9B59B6;
+      --bg: #F0F9FF;
+      --card-bg: #FFFFFF;
+      --text-main: #2D3748;
+      --success: #2ECC71;
+      --danger: #FF4757;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fredoka', cursive, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); padding-bottom: 40px; background-image: radial-gradient(#BEE3F8 15%, transparent 16%); background-size: 30px 30px; }
+
+    .sticky-control-panel {
+      position: sticky; top: 0; z-index: 100;
+      background: #FFFFFF; border-bottom: 4px solid var(--accent);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); padding: 14px 16px;
+    }
+    .panel-container { max-width: 1050px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+    .control-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .btn { padding: 10px 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.15); }
+    .btn:active { transform: translateY(3px); box-shadow: none !important; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 0 #D63031; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #CBD5E0; color: var(--text-main); box-shadow: 0 4px 0 #A0AEC0; }
+    .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 0 #C0392B; }
+
+    select { padding: 10px 16px; border-radius: 16px; border: 3px solid var(--secondary); background: white; font-size: 16px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
+
+    .volume-container {
+      display: flex; align-items: center; gap: 8px; background: #EDF2F7;
+      padding: 6px 14px; border-radius: 16px; border: 2px solid var(--secondary);
+    }
+    .volume-container label { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 4px; }
+    .volume-slider {
+      -webkit-appearance: none; width: 100px; height: 8px; border-radius: 4px;
+      background: #CBD5E0; outline: none; cursor: pointer;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .volume-slider::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%; background: var(--primary);
+      cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: none;
+    }
+    .vol-val-badge { font-weight: 700; color: var(--primary); min-width: 40px; }
+
+    .mic-status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    }
+    .mic-status-granted { background-color: #E8F8F5; color: #2ECC71; border: 2px solid #2ECC71; }
+    .mic-status-denied { background-color: #FDEDEC; color: #E74C3C; border: 2px solid #E74C3C; }
+    .mic-status-prompt { background-color: #FEF9E7; color: #F39C12; border: 2px solid #F39C12; }
+
+    .container { max-width: 1000px; margin: 24px auto 0; padding: 0 16px; }
+    .header { text-align: center; margin-bottom: 28px; }
+    .header h1 { font-size: 36px; color: #FF6B6B; text-shadow: 2px 2px 0px #FFE66D; margin-bottom: 4px; }
+    .header p { font-size: 20px; color: #4A5568; font-weight: 600; }
+
+    .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    .card { background: var(--card-bg); border-radius: 24px; padding: 20px 16px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); border: 4px solid #E2E8F0; display: flex; flex-direction: column; align-items: center; transition: all 0.2s; position: relative; }
+    .card.active { border-color: var(--primary); background-color: #FFF5F5; transform: scale(1.05); box-shadow: 0 12px 25px rgba(255, 107, 107, 0.25); }
+
+    .word { font-size: 28px; font-weight: 700; color: #2B6CB0; letter-spacing: 0.5px; }
+    .ipa { font-size: 15px; color: #38A169; font-weight: 600; margin: 2px 0 6px; }
+    .meaning { font-size: 18px; color: #4A5568; font-weight: 600; margin-bottom: 16px; background: #EDF2F7; padding: 4px 12px; border-radius: 12px; }
+
+    .action-group { display: flex; gap: 10px; margin-bottom: 8px; justify-content: center; flex-wrap: wrap; }
+    
+    .icon-btn { border: none; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 0 rgba(0,0,0,0.12); }
+    .icon-btn:active { transform: translateY(3px); box-shadow: none !important; }
+    .icon-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    
+    .audio-btn { background: #4ECDC4; color: white; box-shadow: 0 5px 0 #36B9B0; }
+    .audio-btn:hover { background: #45B7AA; }
+    
+    .mic-btn { background: #FF6B6B; color: white; box-shadow: 0 5px 0 #EE5253; }
+    .mic-btn:hover { background: #FF5252; }
+    .mic-btn.listening { background: #FF9F43; animation: pulse 1s infinite alternate; }
+
+    .playback-btn { background: var(--purple); color: white; box-shadow: 0 5px 0 #8E44AD; }
+    .playback-btn:hover { background: #8E44AD; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 159, 67, 0.7); }
+      100% { transform: scale(1.15); box-shadow: 0 0 0 15px rgba(255, 159, 67, 0); }
+    }
+
+    .icon-btn svg { width: 26px; height: 26px; fill: currentColor; }
+
+    .feedback { font-size: 15px; font-weight: 700; min-height: 24px; text-align: center; margin-top: 4px; }
+    .feedback.correct { color: var(--success); }
+    .feedback.incorrect { color: var(--danger); }
+    .feedback.listening { color: #DD6B20; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <div class="sticky-control-panel">
+    <div class="panel-container">
+      <div class="control-group">
+        <select id="topicSelect" onchange="changeTopic()"></select>
+        <div id="micStatus" class="mic-status-badge mic-status-prompt">🎙️ Mic: Đang kiểm tra...</div>
+      </div>
+
+      <div class="control-group">
+        <button id="playBtn" class="btn btn-primary" onclick="togglePlayAll()">▶ Đọc Từng Từ</button>
+        <button id="stopBtn" class="btn btn-danger" onclick="stopSpeech()">■ Dừng</button>
+      </div>
+
+      <div class="control-group">
+        <label for="accentSelect" style="font-weight: 700;">Giọng:</label>
+        <select id="accentSelect" onchange="updateVoiceSettings()">
+          <option value="en-US">Anh - Mỹ 🇺🇸</option>
+          <option value="en-GB">Anh - Anh 🇬🇧</option>
+        </select>
+
+        <label for="rateSelect" style="font-weight: 700;">Tốc độ:</label>
+        <select id="rateSelect" onchange="updateVoiceSettings()">
+          <option value="0.75" selected>Chậm (Cho bé)</option>
+          <option value="1.0">Vừa phải</option>
+        </select>
+
+        <div class="volume-container">
+          <label for="volumeSlider">🔊</label>
+          <input type="range" id="volumeSlider" class="volume-slider" min="10" max="100" value="100" step="5" oninput="onVolumeChange(this.value)">
+          <span id="volumeValue" class="vol-val-badge">100%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1 id="topicTitle"></h1>
+      <p id="topicTitleVi"></p>
+    </div>
+
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </div>
+
+  <!-- Audio element cố định dùng để mở khóa âm thanh trên iPad -->
+  <audio id="globalAudioPlayer" playsinline preload="auto"></audio>
+
+  <script>
+    const topicsData = [
+      {
+        id: "school-and-classroom", title: "School and Classroom 🏫", titleVi: "Trường và lớp học",
+        words: [
+          { word: "book", ipa: "/bʊk/", meaning: "sách" }, { word: "bag", ipa: "/bæg/", meaning: "cặp sách" },
+          { word: "desk", ipa: "/desk/", meaning: "bàn học" }, { word: "chair", ipa: "/tʃeər/", meaning: "ghế" },
+          { word: "pen", ipa: "/pen/", meaning: "bút bi" }, { word: "pencil", ipa: "/'pensl/", meaning: "bút chì" },
+          { word: "ruler", ipa: "/'ru:lər/", meaning: "thước kẻ" }, { word: "paper", ipa: "/'peɪpər/", meaning: "giấy" },
+          { word: "board", ipa: "/bɔ:rd/", meaning: "bảng" }, { word: "class", ipa: "/klæs/", meaning: "lớp học" },
+          { word: "teacher", ipa: "/'ti:tʃər/", meaning: "giáo viên" }, { word: "student", ipa: "/'stu:dənt/", meaning: "học sinh" },
+          { word: "read", ipa: "/ri:d/", meaning: "đọc" }, { word: "write", ipa: "/raɪt/", meaning: "viết" },
+          { word: "draw", ipa: "/drɔ:/", meaning: "vẽ" }, { word: "color", ipa: "/'kʌlər/", meaning: "tô màu" },
+          { word: "count", ipa: "/kaʊnt/", meaning: "đếm" }, { word: "spell", ipa: "/spel/", meaning: "đánh vần" },
+          { word: "listen", ipa: "/'lɪsn/", meaning: "nghe" }, { word: "speak", ipa: "/spi:k/", meaning: "nói" }
+        ]
+      },
+      {
+        id: "family-and-people", title: "Family and People 👨‍👩‍👧‍👦", titleVi: "Gia đình và Con người",
+        words: [
+          { word: "family", ipa: "/'fæm.əl.i/", meaning: "gia đình" }, { word: "mother", ipa: "/'mʌð.ər/", meaning: "mẹ" },
+          { word: "father", ipa: "/'fɑ:.ðər/", meaning: "bố / ba" }, { word: "sister", ipa: "/'sɪs.tər/", meaning: "chị / em gái" },
+          { word: "brother", ipa: "/'brʌð.ər/", meaning: "anh / em trai" }, { word: "baby", ipa: "/'beɪ.bi/", meaning: "em bé" },
+          { word: "grandmother", ipa: "/'græn.mʌð.ər/", meaning: "bà" }, { word: "grandfather", ipa: "/'græn.fɑ:.ðər/", meaning: "ông" },
+          { word: "friend", ipa: "/frend/", meaning: "bạn bè" }, { word: "child", ipa: "/tʃaɪld/", meaning: "trẻ em" },
+          { word: "boy", ipa: "/bɔɪ/", meaning: "con trai" }, { word: "girl", ipa: "/gɜ:rl/", meaning: "con gái" },
+          { word: "man", ipa: "/mæn/", meaning: "đàn ông" }, { word: "woman", ipa: "/'wʊm.ən/", meaning: "phụ nữ" },
+          { word: "name", ipa: "/neɪm/", meaning: "tên" }, { word: "kind", ipa: "/kaɪnd/", meaning: "tử tế / tốt bụng" },
+          { word: "help", ipa: "/help/", meaning: "giúp đỡ" }, { word: "share", ipa: "/ʃeər/", meaning: "chia sẻ" },
+          { word: "smile", ipa: "/smaɪl/", meaning: "cười mỉm" }, { word: "together", ipa: "/tə'geð.ər/", meaning: "cùng nhau" }
+        ]
+      },
+      {
+        id: "home-and-furniture", title: "Home and Furniture 🏡", titleVi: "Nhà và nội thất",
+        words: [
+          { word: "home", ipa: "/hoʊm/", meaning: "nhà" }, { word: "house", ipa: "/haʊs/", meaning: "ngôi nhà" },
+          { word: "room", ipa: "/ru:m/", meaning: "phòng" }, { word: "door", ipa: "/dɔ:r/", meaning: "cửa ra vào" },
+          { word: "window", ipa: "/'wɪndoʊ/", meaning: "cửa sổ" }, { word: "wall", ipa: "/wɔ:l/", meaning: "tường" },
+          { word: "floor", ipa: "/flɔ:r/", meaning: "sàn nhà" }, { word: "roof", ipa: "/ru:f/", meaning: "mái nhà" },
+          { word: "kitchen", ipa: "/'kɪtʃən/", meaning: "nhà bếp" }, { word: "bedroom", ipa: "/'bedru:m/", meaning: "phòng ngủ" },
+          { word: "bathroom", ipa: "/'bæθru:m/", meaning: "phòng tắm" }, { word: "table", ipa: "/'teɪbəl/", meaning: "cái bàn" },
+          { word: "bed", ipa: "/bed/", meaning: "cái giường" }, { word: "lamp", ipa: "/læmp/", meaning: "đèn" },
+          { word: "sofa", ipa: "/'soʊfə/", meaning: "ghế xô-pha" }, { word: "shelf", ipa: "/ʃelf/", meaning: "kệ, giá" },
+          { word: "clock", ipa: "/klɑ:k/", meaning: "đồng hồ" }, { word: "clean", ipa: "/kli:n/", meaning: "sạch sẽ" },
+          { word: "open", ipa: "/'oʊpən/", meaning: "mở" }, { word: "close", ipa: "/kloʊs/", meaning: "đóng" }
+        ]
+      },
+      {
+        id: "clothes-and-weather", title: "Clothes and Weather 👕☀️", titleVi: "Quần áo và Thời tiết",
+        words: [
+          { word: "shirt", ipa: "/ʃɜ:rt/", meaning: "áo sơ mi" }, { word: "pants", ipa: "/pænts/", meaning: "quần dài" },
+          { word: "dress", ipa: "/dres/", meaning: "váy liền" }, { word: "skirt", ipa: "/skɜ:rt/", meaning: "chân váy" },
+          { word: "coat", ipa: "/koʊt/", meaning: "áo khoác" }, { word: "jacket", ipa: "/'dʒækɪt/", meaning: "áo khoác nhẹ" },
+          { word: "sock", ipa: "/sɑ:k/", meaning: "tất/vớ" }, { word: "shoe", ipa: "/ʃu:/", meaning: "giày" },
+          { word: "hat", ipa: "/hæt/", meaning: "mũ/nón" }, { word: "scarf", ipa: "/skɑ:rf/", meaning: "khăn quàng" },
+          { word: "sunny", ipa: "/'sʌni/", meaning: "nắng" }, { word: "rainy", ipa: "/'reɪni/", meaning: "mưa" },
+          { word: "cloudy", ipa: "/'klaʊdi/", meaning: "nhiều mây" }, { word: "windy", ipa: "/'wɪndi/", meaning: "gió" },
+          { word: "hot", ipa: "/hɑ:t/", meaning: "nóng" }, { word: "cold", ipa: "/koʊld/", meaning: "lạnh" },
+          { word: "warm", ipa: "/wɔ:rm/", meaning: "ấm" }, { word: "cool", ipa: "/ku:l/", meaning: "mát" },
+          { word: "wear", ipa: "/weər/", meaning: "mặc" }, { word: "weather", ipa: "/'weðər/", meaning: "thời tiết" }
+        ]
+      },
+      {
+        id: "body-and-health", title: "Body and Health 🙋‍♂️", titleVi: "Cơ thể và Sức khỏe",
+        words: [
+          { word: "head", ipa: "/hed/", meaning: "đầu" }, { word: "hair", ipa: "/heər/", meaning: "tóc" },
+          { word: "face", ipa: "/feɪs/", meaning: "khuôn mặt" }, { word: "eye", ipa: "/aɪ/", meaning: "mắt" },
+          { word: "ear", ipa: "/ɪər/", meaning: "tai" }, { word: "nose", ipa: "/noʊz/", meaning: "mũi" },
+          { word: "mouth", ipa: "/maʊθ/", meaning: "miệng" }, { word: "tooth", ipa: "/tu:θ/", meaning: "răng" },
+          { word: "neck", ipa: "/nek/", meaning: "cổ" }, { word: "arm", ipa: "/ɑ:rm/", meaning: "cánh tay" },
+          { word: "hand", ipa: "/hænd/", meaning: "bàn tay" }, { word: "finger", ipa: "/'fɪŋɡər/", meaning: "ngón tay" },
+          { word: "leg", ipa: "/leg/", meaning: "chân" }, { word: "foot", ipa: "/fʊt/", meaning: "bàn chân" },
+          { word: "knee", ipa: "/ni:/", meaning: "đầu gối" }, { word: "heart", ipa: "/hɑ:rt/", meaning: "trái tim" },
+          { word: "body", ipa: "/'bɑ:di/", meaning: "cơ thể" }, { word: "wash", ipa: "/wɑ:ʃ/", meaning: "rửa" },
+          { word: "brush", ipa: "/brʌʃ/", meaning: "đánh/chải" }, { word: "healthy", ipa: "/'helθi/", meaning: "khỏe mạnh" }
+        ]
+      },
+      {
+        id: "animals", title: "Animals 🐶", titleVi: "Động vật",
+        words: [
+          { word: "cat", ipa: "/kæt/", meaning: "con mèo" }, { word: "dog", ipa: "/dɔ:ɡ/", meaning: "con chó" },
+          { word: "rabbit", ipa: "/'ræb.ɪt/", meaning: "con thỏ" }, { word: "bird", ipa: "/bɜ:rd/", meaning: "con chim" },
+          { word: "duck", ipa: "/dʌk/", meaning: "con vịt" }, { word: "frog", ipa: "/frɔ:ɡ/", meaning: "con ếch" },
+          { word: "fish", ipa: "/fɪʃ/", meaning: "con cá" }, { word: "turtle", ipa: "/'tɜ:r.təl/", meaning: "con rùa" },
+          { word: "monkey", ipa: "/'mʌŋ.ki/", meaning: "con khỉ" }, { word: "tiger", ipa: "/'taɪ.ɡər/", meaning: "con hổ" },
+          { word: "lion", ipa: "/'laɪ.ən/", meaning: "con sư tử" }, { word: "elephant", ipa: "/'el.ɪ.fənt/", meaning: "con voi" },
+          { word: "giraffe", ipa: "/dʒɪ'ræf/", meaning: "con hươu cao cổ" }, { word: "zebra", ipa: "/'zeb.rə/", meaning: "con ngựa vằn" },
+          { word: "snake", ipa: "/sneɪk/", meaning: "con rắn" }, { word: "horse", ipa: "/hɔ:rs/", meaning: "con ngựa" },
+          { word: "cow", ipa: "/kaʊ/", meaning: "con bò" }, { word: "goat", ipa: "/ɡoʊt/", meaning: "con dê" },
+          { word: "sheep", ipa: "/ʃi:p/", meaning: "con cừu" }, { word: "animal", ipa: "/'æn.ɪ.məl/", meaning: "động vật" }
+        ]
+      },
+      {
+        id: "food-and-drinks", title: "Food and Drinks 🍎", titleVi: "Đồ ăn và thức uống",
+        words: [
+          { word: "apple", ipa: "/'æp.əl/", meaning: "táo" }, { word: "banana", ipa: "/bə'næ.nə/", meaning: "chuối" },
+          { word: "orange", ipa: "/'ɔ:r.ɪndʒ/", meaning: "cam" }, { word: "grape", ipa: "/ɡreɪp/", meaning: "nho" },
+          { word: "mango", ipa: "/'mæŋ.ɡoʊ/", meaning: "xoài" }, { word: "rice", ipa: "/raɪs/", meaning: "cơm" },
+          { word: "bread", ipa: "/bred/", meaning: "bánh mì" }, { word: "egg", ipa: "/eɡ/", meaning: "trứng" },
+          { word: "milk", ipa: "/mɪlk/", meaning: "sữa" }, { word: "water", ipa: "/'wɔ:.tər/", meaning: "nước" },
+          { word: "juice", ipa: "/dʒu:s/", meaning: "nước ép" }, { word: "soup", ipa: "/su:p/", meaning: "canh/súp" },
+          { word: "chicken", ipa: "/'tʃɪk.ɪn/", meaning: "gà" }, { word: "noodles", ipa: "/'nu:.dəlz/", meaning: "mì" },
+          { word: "cake", ipa: "/keɪk/", meaning: "bánh ngọt" }, { word: "cookie", ipa: "/'kʊk.i/", meaning: "bánh quy" },
+          { word: "hungry", ipa: "/'hʌŋ.ɡri/", meaning: "đói" }, { word: "thirsty", ipa: "/'θɜ:r.sti/", meaning: "khát" },
+          { word: "eat", ipa: "/i:t/", meaning: "ăn" }, { word: "drink", ipa: "/drɪŋk/", meaning: "uống" }
+        ]
+      },
+      {
+        id: "actions-and-daily-routines", title: "Actions & Daily Routines 🏃‍♂️", titleVi: "Các hành động và thói quen hàng ngày",
+        words: [
+          { word: "wake", ipa: "/weɪk/", meaning: "thức dậy" }, { word: "sleep", ipa: "/sli:p/", meaning: "ngủ" },
+          { word: "get", ipa: "/ɡet/", meaning: "lấy, nhận" }, { word: "go", ipa: "/ɡoʊ/", meaning: "đi" },
+          { word: "come", ipa: "/kʌm/", meaning: "đến" }, { word: "sit", ipa: "/sɪt/", meaning: "ngồi" },
+          { word: "stand", ipa: "/stænd/", meaning: "đứng" }, { word: "walk", ipa: "/wɔ:k/", meaning: "đi bộ" },
+          { word: "run", ipa: "/rʌn/", meaning: "chạy" }, { word: "jump", ipa: "/dʒʌmp/", meaning: "nhảy" },
+          { word: "play", ipa: "/pleɪ/", meaning: "chơi" }, { word: "work", ipa: "/wɜ:rk/", meaning: "làm việc" },
+          { word: "study", ipa: "/'stʌdi/", meaning: "học bài" }, { word: "make", ipa: "/meɪk/", meaning: "làm, tạo ra" },
+          { word: "take", ipa: "/teɪk/", meaning: "lấy, cầm" }, { word: "give", ipa: "/ɡɪv/", meaning: "cho, tặng" },
+          { word: "cook", ipa: "/kʊk/", meaning: "nấu ăn" }, { word: "carry", ipa: "/'kæri/", meaning: "mang, vác" },
+          { word: "start", ipa: "/stɑ:rt/", meaning: "bắt đầu" }, { word: "finish", ipa: "/'fɪnɪʃ/", meaning: "kết thúc" }
+        ]
+      },
+      {
+        id: "community-places-and-transportation", title: "Places & Transportation 🚌", titleVi: "Địa điểm cộng đồng và Giao thông",
+        words: [
+          { word: "park", ipa: "/pɑ:rk/", meaning: "công viên" }, { word: "store", ipa: "/stɔ:r/", meaning: "cửa hàng" },
+          { word: "market", ipa: "/'mɑ:rkɪt/", meaning: "chợ" }, { word: "hospital", ipa: "/'hɑ:spɪtl/", meaning: "bệnh viện" },
+          { word: "library", ipa: "/'laɪbreri/", meaning: "thư viện" }, { word: "farm", ipa: "/fɑ:rm/", meaning: "trang trại" },
+          { word: "zoo", ipa: "/zu:/", meaning: "sở thú" }, { word: "street", ipa: "/stri:t/", meaning: "đường phố" },
+          { word: "road", ipa: "/roʊd/", meaning: "con đường" }, { word: "city", ipa: "/'sɪti/", meaning: "thành phố" },
+          { word: "bus", ipa: "/bʌs/", meaning: "xe buýt" }, { word: "car", ipa: "/kɑ:r/", meaning: "xe ô tô" },
+          { word: "bike", ipa: "/baɪk/", meaning: "xe đạp" }, { word: "train", ipa: "/treɪn/", meaning: "tàu hỏa" },
+          { word: "boat", ipa: "/boʊt/", meaning: "tàu thuyền" }, { word: "plane", ipa: "/pleɪn/", meaning: "máy bay" },
+          { word: "stop", ipa: "/stɑ:p/", meaning: "dừng lại" }, { word: "turn", ipa: "/tɜ:rn/", meaning: "rẽ/quẹo" },
+          { word: "near", ipa: "/nɪər/", meaning: "gần" }, { word: "far", ipa: "/fɑ:r/", meaning: "xa" }
+        ]
+      },
+      {
+        id: "nature-time-and-feelings", title: "Nature & Feelings 🌟", titleVi: "Thiên nhiên, Thời gian và Cảm xúc",
+        words: [
+          { word: "sun", ipa: "/sʌn/", meaning: "mặt trời" }, { word: "moon", ipa: "/mu:n/", meaning: "mặt trăng" },
+          { word: "star", ipa: "/stɑ:r/", meaning: "ngôi sao" }, { word: "sky", ipa: "/skaɪ/", meaning: "bầu trời" },
+          { word: "cloud", ipa: "/klaʊd/", meaning: "đám mây" }, { word: "rain", ipa: "/reɪn/", meaning: "mưa" },
+          { word: "wind", ipa: "/wɪnd/", meaning: "gió" }, { word: "tree", ipa: "/tri:/", meaning: "cây" },
+          { word: "flower", ipa: "/'flaʊər/", meaning: "bông hoa" }, { word: "grass", ipa: "/ɡræs/", meaning: "cỏ" },
+          { word: "river", ipa: "/'rɪvər/", meaning: "sông" }, { word: "mountain", ipa: "/'maʊntn/", meaning: "núi" },
+          { word: "morning", ipa: "/'mɔ:rnɪŋ/", meaning: "buổi sáng" }, { word: "afternoon", ipa: "/ˌæftər'nu:n/", meaning: "buổi chiều" },
+          { word: "night", ipa: "/naɪt/", meaning: "buổi đêm" }, { word: "happy", ipa: "/'hæpi/", meaning: "vui vẻ" },
+          { word: "sad", ipa: "/sæd/", meaning: "buồn bã" }, { word: "angry", ipa: "/'æŋɡri/", meaning: "tức giận" },
+          { word: "scared", ipa: "/skerd/", meaning: "sợ hãi" }, { word: "excited", ipa: "/ɪk'saɪtɪd/", meaning: "hào hứng" }
+        ]
+      }
+    ];
+
+    let currentCardIndex = -1;
+    let isPlayingAll = false;
+    let isPaused = false;
+    let availableVoices = [];
+    let activeRecognition = null;
+
+    let recordedAudioUrls = {};
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let userStream = null;
+    let currentMimeType = '';
+
+    function getSupportedMimeType() {
+      const types = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+      for (let t of types) {
+        if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
+          return t;
+        }
+      }
+      return '';
+    }
+
+    async function checkMicrophonePermission() {
+      const badge = document.getElementById("micStatus");
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        badge.className = "mic-status-badge mic-status-denied";
+        badge.textContent = "🎙️ Trình duyệt không hỗ trợ Mic";
+        return false;
+      }
+
+      try {
+        if (navigator.permissions && navigator.permissions.query) {
+          const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+          updateMicStatusBadge(permissionStatus.state);
+          permissionStatus.onchange = () => updateMicStatusBadge(permissionStatus.state);
+        } else {
+          badge.className = "mic-status-badge mic-status-prompt";
+          badge.textContent = "🎙️ Mic: Bấm nút nói để cấp quyền";
+        }
+      } catch (e) {
+        badge.className = "mic-status-badge mic-status-prompt";
+        badge.textContent = "🎙️ Mic: Sẵn sàng";
+      }
+    }
+
+    function updateMicStatusBadge(state) {
+      const badge = document.getElementById("micStatus");
+      if (state === 'granted') {
+        badge.className = "mic-status-badge mic-status-granted";
+        badge.textContent = "🎙️ Mic: Đã cho phép";
+      } else if (state === 'denied') {
+        badge.className = "mic-status-badge mic-status-denied";
+        badge.textContent = "🎙️ Mic: Bị từ chối";
+      } else {
+        badge.className = "mic-status-badge mic-status-prompt";
+        badge.textContent = "🎙️ Mic: Chưa cấp quyền";
+      }
+    }
+
+    async function requestMicAccess() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        userStream = stream;
+        updateMicStatusBadge('granted');
+        return stream;
+      } catch (err) {
+        updateMicStatusBadge('denied');
+        alert("Vui lòng BẬT QUYỀN TRUY CẬP MICROPHONE trên trình duyệt Safari/iPad!");
+        return null;
+      }
+    }
+
+    function loadVoices() {
+      if ('speechSynthesis' in window) {
+        availableVoices = window.speechSynthesis.getVoices();
+      }
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function initDropdown() {
+      const select = document.getElementById("topicSelect");
+      topicsData.forEach((topic, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${topic.title} (${topic.titleVi})`;
+        select.appendChild(option);
+      });
+    }
+
+    function renderVocabulary() {
+      stopSpeech();
+      const topicIndex = document.getElementById("topicSelect").value || 0;
+      const currentTopic = topicsData[topicIndex];
+
+      document.getElementById("topicTitle").textContent = currentTopic.title;
+      document.getElementById("topicTitleVi").textContent = currentTopic.titleVi;
+
+      const vocabGrid = document.getElementById("vocabGrid");
+      vocabGrid.innerHTML = "";
+
+      currentTopic.words.forEach((item, index) => {
+        const key = `${topicIndex}-${index}`;
+        const hasRecording = !!recordedAudioUrls[key];
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.id = `card-${index}`;
+        card.innerHTML = `
+          <div class="word">${item.word}</div>
+          <div class="ipa">${item.ipa}</div>
+          <div class="meaning">${item.meaning}</div>
+          <div class="action-group">
+            <button class="icon-btn audio-btn" onclick="speakSingle(${index})" title="Mẫu chuẩn">
+              <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </button>
+            <button id="mic-btn-${index}" class="icon-btn mic-btn" onclick="startRecognition(${index}, '${item.word}')" title="Bé luyện đọc">
+              <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+            </button>
+            <button id="play-user-btn-${index}" class="icon-btn playback-btn" onclick="playUserRecording(${index})" title="Nghe lại giọng bé" ${hasRecording ? '' : 'disabled'}>
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+            </button>
+          </div>
+          <div class="feedback" id="feedback-${index}"></div>
+        `;
+        vocabGrid.appendChild(card);
+      });
+    }
+
+    function changeTopic() { renderVocabulary(); }
+
+    function onVolumeChange(val) {
+      document.getElementById("volumeValue").textContent = `${val}%`;
+      updateVoiceSettings();
+    }
+
+    function speakSingle(index) {
+      if (isPlayingAll) stopSpeech();
+      highlightCard(index);
+      const topicIndex = document.getElementById("topicSelect").value || 0;
+      const word = topicsData[topicIndex].words[index].word;
+      speakWord(word, () => unhighlightCard(index));
+    }
+
+    function speakWord(text, onEndCallback) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      const lang = document.getElementById("accentSelect").value;
+      const rate = parseFloat(document.getElementById("rateSelect").value);
+      const volPercent = parseInt(document.getElementById("volumeSlider").value, 10);
+
+      utterance.lang = lang;
+      utterance.rate = rate;
+      utterance.volume = volPercent / 100;
+      utterance.pitch = 1.1;
+
+      if (availableVoices.length === 0) loadVoices();
+      
+      const targetVoice = availableVoices.find(v => (v.lang === lang || v.lang.replace('_', '-') === lang) && (v.name.includes("Enhanced") || v.name.includes("Google") || v.name.includes("Natural"))) || 
+                          availableVoices.find(v => v.lang === lang || v.lang.replace('_', '-') === lang);
+      
+      if (targetVoice) utterance.voice = targetVoice;
+
+      utterance.onend = () => { if (onEndCallback) onEndCallback(); };
+      utterance.onerror = () => { if (onEndCallback) onEndCallback(); };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    async function startRecognition(index, targetWord) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("Bé mở trên trình duyệt Safari / Chrome của iPad để sử dụng micro nhé!");
+        return;
+      }
+
+      const stream = await requestMicAccess();
+      if (!stream) return;
+
+      if (isPlayingAll) stopSpeech();
+      if (activeRecognition) activeRecognition.abort();
+      if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+
+      const micBtn = document.getElementById(`mic-btn-${index}`);
+      const feedbackEl = document.getElementById(`feedback-${index}`);
+
+      micBtn.classList.add("listening");
+      feedbackEl.className = "feedback listening";
+      feedbackEl.textContent = "🎙️ Bé nói đi...";
+
+      audioChunks = [];
+      try {
+        currentMimeType = getSupportedMimeType();
+        const options = currentMimeType ? { mimeType: currentMimeType } : {};
+        
+        mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+        
+        mediaRecorder.onstop = () => {
+          const blobOptions = currentMimeType ? { type: currentMimeType } : {};
+          const audioBlob = new Blob(audioChunks, blobOptions);
+          const audioUrl = URL.createObjectURL(audioBlob);
+          
+          const topicIndex = document.getElementById("topicSelect").value || 0;
+          const key = `${topicIndex}-${index}`;
+          recordedAudioUrls[key] = audioUrl;
+
+          const userPlayBtn = document.getElementById(`play-user-btn-${index}`);
+          if (userPlayBtn) userPlayBtn.removeAttribute("disabled");
+        };
+        
+        mediaRecorder.start();
+      } catch (e) {
+        console.warn("MediaRecorder error:", e);
+      }
+
+      const recognition = new SpeechRecognition();
+      activeRecognition = recognition;
+
+      recognition.lang = document.getElementById("accentSelect").value;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 3;
+
+      recognition.onresult = (event) => {
+        micBtn.classList.remove("listening");
+        const results = Array.from(event.results[0]).map(r => r.transcript.toLowerCase().trim());
+        const cleanTarget = targetWord.toLowerCase().trim();
+
+        const isCorrect = results.some(transcript => transcript === cleanTarget || transcript.includes(cleanTarget));
+
+        if (isCorrect) {
+          feedbackEl.className = "feedback correct";
+          feedbackEl.textContent = "🌟 Bé giỏi quá!";
+        } else {
+          feedbackEl.className = "feedback incorrect";
+          feedbackEl.textContent = "❌ Thử lại nào!";
+        }
+      };
+
+      recognition.onerror = () => {
+        micBtn.classList.remove("listening");
+        feedbackEl.className = "feedback incorrect";
+        feedbackEl.textContent = "Thử lại nhé!";
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove("listening");
+        activeRecognition = null;
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+      };
+
+      recognition.start();
+    }
+
+    // XỬ LÝ PHÁT ÂM THANH MỞ KHÓA TRỰC TIẾP DÀNH CHO IPAD
+    function playUserRecording(index) {
+      if (isPlayingAll) stopSpeech();
+      
+      const topicIndex = document.getElementById("topicSelect").value || 0;
+      const key = `${topicIndex}-${index}`;
+      const url = recordedAudioUrls[key];
+
+      if (!url) return;
+
+      // Sử dụng thẻ audio toàn cục đã tạo trong DOM
+      const audioPlayer = document.getElementById("globalAudioPlayer");
+      const volPercent = parseInt(document.getElementById("volumeSlider").value, 10);
+      
+      audioPlayer.src = url;
+      audioPlayer.volume = volPercent / 100;
+
+      // Mở khóa và phát trực tiếp ngay lập tức khi click
+      audioPlayer.play().catch(error => {
+        console.warn("Autoplay blocked:", error);
+        // Fallback retry
+        audioPlayer.load();
+        audioPlayer.play();
+      });
+    }
+
+    function togglePlayAll() {
+      const playBtn = document.getElementById("playBtn");
+
+      if (!isPlayingAll) {
+        isPlayingAll = true;
+        isPaused = false;
+        playBtn.textContent = "⏸ Tạm Dừng";
+        playBtn.className = "btn btn-secondary";
+        if (currentCardIndex === -1) currentCardIndex = 0;
+        playNextWord();
+      } else if (isPaused) {
+        isPaused = false;
+        playBtn.textContent = "⏸ Tạm Dừng";
+        playBtn.className = "btn btn-secondary";
+        playNextWord();
+      } else {
+        isPaused = true;
+        playBtn.textContent = "▶ Tiếp Tục";
+        playBtn.className = "btn btn-primary";
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function playNextWord() {
+      if (!isPlayingAll || isPaused) return;
+
+      const topicIndex = document.getElementById("topicSelect").value || 0;
+      const words = topicsData[topicIndex].words;
+
+      if (currentCardIndex >= words.length) {
+        stopSpeech();
+        return;
+      }
+
+      highlightCard(currentCardIndex);
+      const word = words[currentCardIndex].word;
+
+      speakWord(word, () => {
+        unhighlightCard(currentCardIndex);
+        currentCardIndex++;
+        if (isPlayingAll && !isPaused) {
+          setTimeout(playNextWord, 600);
+        }
+      });
+    }
+
+    function stopSpeech() {
+      window.speechSynthesis.cancel();
+      if (activeRecognition) activeRecognition.abort();
+      if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+      if (currentCardIndex !== -1) unhighlightCard(currentCardIndex);
+      isPlayingAll = false;
+      isPaused = false;
+      currentCardIndex = -1;
+
+      const playBtn = document.getElementById("playBtn");
+      playBtn.textContent = "▶ Đọc Từng Từ";
+      playBtn.className = "btn btn-primary";
+    }
+
+    function updateVoiceSettings() {
+      if (isPlayingAll && !isPaused) {
+        window.speechSynthesis.cancel();
+        playNextWord();
+      }
+    }
+
+    function highlightCard(index) {
+      const activeCard = document.querySelector('.card.active');
+      if (activeCard) activeCard.classList.remove('active');
+
+      const card = document.getElementById(`card-${index}`);
+      if (card) {
+        card.classList.add('active');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function unhighlightCard(index) {
+      const card = document.getElementById(`card-${index}`);
+      if (card) card.classList.remove('active');
+    }
+
+    loadVoices();
+    initDropdown();
+    renderVocabulary();
+    checkMicrophonePermission();
+  </script>
+</body>
+</html>
